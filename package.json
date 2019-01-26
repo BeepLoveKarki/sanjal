@@ -1,0 +1,31 @@
+{
+  "name": "khudra-back",
+  "version": "1.0.0",
+  "description": "Node JS boilerplate code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BeepLoveKarki/khudra-back.git"
+  },
+  "author": "Electrocoders <coderselectro@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BeepLoveKarki/khudra-back/issues"
+  },
+  "homepage": "https://github.com/BeepLoveKarki/khudra-back#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-fileupload": "^1.1.1-alpha.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "mongoose": "^5.4.6",
+    "socket.io": "^2.2.0"
+  }
+}
