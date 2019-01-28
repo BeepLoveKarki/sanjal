@@ -1,6 +1,24 @@
 let mongoose=require('mongoose');
 let bcrypt=require('bcryptjs');
 
+let cartSchema=new mongoose.Schema({
+   name:String,
+   type:String,
+   quantity:Number,
+   cost:Number,
+   date:{ type : Date, default: Date.now }
+});
+
+let purchasedSchema=new mongoose.Schema({
+   name:String,
+   type:String,
+   quantity:Number,
+   cost:Number,
+   purchasedDate:{ type : Date, default: Date.now },
+   deliveryDate:Date,
+   delivered:Boolean
+});
+
 let userSchema=new mongoose.Schema({
   retailname:String,
   address:String,
@@ -8,7 +26,19 @@ let userSchema=new mongoose.Schema({
   number:Number,
   email: String,
   username:String,
-  password:String
+  password:String,
+  latitude:Number,
+  longitude:Number,
+  credits:{
+	 type:Number,
+	 default:0
+  },
+  interest:{
+	 type:Number,
+	 default:0
+  },
+  carts:[cartSchema],
+  purchases:[purchasedSchema]
 });
 
 userSchema.statics.findByCredentials=function(username){
@@ -54,4 +84,8 @@ userSchema.pre('save',function(next){  //this middleware runs prior to every sav
   }
 });
 
-module.exports=mongoose.model("user",userSchema);
+let user=mongoose.model("user",userSchema);
+let cart=mongoose.model("cart",cartSchema);
+let purchase=mongoose.model("purchase",purchasedSchema);
+
+module.exports={user,cart,purchase};
