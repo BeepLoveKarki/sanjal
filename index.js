@@ -34,6 +34,31 @@ app.post('/login',(req,res)=>{
    });
 });
 
+app.post('/getuser',(req,res)=>{
+   user.findByCredentials(req.body.username).then((user)=>{
+     res.send(JSON.stringify({data:user}));
+   });
+});
+
+app.post('/loginchange',(req,res)=>{
+  if(req.body["a"]==0){
+    user.findOneAndUpdate({username:req.body.username},{$set:{username:req.body.data}},(err,data)=>{
+	  if(err) console.log(err);
+	  res.send(JSON.stringify({status:"OK"}));
+	});
+  }else{
+    bcrypt.genSalt(10,(err,salt)=>{
+      bcrypt.hash(req.body["data"],salt,(err,hash)=>{
+		 if(err) console.log(err);
+         user.findOneAndUpdate({username:req.body.username},{$set:{password:hash}},(err1,data)=>{
+	       if(err) console.log(err);
+	       res.send(JSON.stringify({status:"OK"}));
+	     });
+	  });
+	});
+  }
+});
+
 app.post('/signup',(req,res)=>{
   let photo=req.files.pic;
   let cit=req.files.cit;
