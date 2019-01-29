@@ -116,10 +116,22 @@ app.post('/purchase',(req,res)=>{
   });
 });
 
+app.post('/getcredits',(req,res)=>{
+   user.findOne({username:req.body.username},(err,user)=>{
+	res.send(JSON.stringify({credits:user.credits,interest:user.interest})); 
+   });
+});
+
 app.post('/removecart',(req,res)=>{
   user.findOneAndUpdate({username:req.body.username},{$pull:{carts:{date:new Date(req.body.date)}}},(err,data)=>{
 	 res.send(JSON.stringify({status:"OK"}));
   });
+});
+
+app.post('/getpurchases',(req,res)=>{
+  user.findOne({username:req.body.username},(err,user)=>{
+	res.send(JSON.stringify({data:user.purchases})); 
+   });
 });
 
 function checkpass(username,hash,nohash,res,req){

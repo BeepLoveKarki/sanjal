@@ -4,7 +4,7 @@ let bcrypt=require('bcryptjs');
 let cartSchema=new mongoose.Schema({
    name:String,
    type:String,
-   quantity:Number,
+   quantity:String,
    cost:Number,
    date:{ type : Date, default: Date.now }
 });
@@ -12,7 +12,7 @@ let cartSchema=new mongoose.Schema({
 let purchasedSchema=new mongoose.Schema({
    name:String,
    type:String,
-   quantity:Number,
+   quantity:String,
    cost:Number,
    purchasedDate:{ type : Date, default: Date.now },
    deliveryDate:Date,
