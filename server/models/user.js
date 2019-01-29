@@ -62,17 +62,15 @@ userSchema.statics.findByNumber=function(number){
 }
 
 userSchema.methods.saveRecord=function(){
-  var user=this;
-return   user.save().then((doc)=>{
+return   this.save().then((doc)=>{
     return doc;
   },(err)=>{
     return err;
   });
 };
 
-userSchema.pre('save',function(next){  //this middleware runs prior to every save function of userSchema instance.
-  if (this.isModified('password')){//only hashes the password if the password is modified ,for other operation
-    //no hashing is done to avoid multiple hashing of passwords
+userSchema.pre('save',function(next){  
+  if (this.isModified('password')){
     bcrypt.genSalt(10,(err,salt)=>{
       bcrypt.hash(this.password,salt,(err,hash)=>{
         this.password=hash;
