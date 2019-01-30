@@ -33,7 +33,7 @@ io.sockets.on('connection', function (socket) {
 	 socket.on('good',(data)=>{
 	   sendgoods(socket);
 	 });
- });
+});
 
  
 app.get("/",(req,res)=>{
@@ -177,7 +177,7 @@ app.post('/deliveryloginchange',(req,res)=>{ //by admin
 
 app.post('/getrelevantpurchases',(req,res)=>{
   let d1={latitude: req.body["lat"], longitude: req.body["long"]};
-  let range=req.body["range"];
+  //let range=req.body["range"];
   let d2={};
   let data=new Array();
   user.find({},(err,users)=>{
@@ -185,13 +185,17 @@ app.post('/getrelevantpurchases',(req,res)=>{
 	  if(val["purchases"].length!=0){
 	    d2["latitude"]=val["latitude"];
 		d2["longitude"]=val["longitude"];
-		if(geolib.getDistance(d1,d2)<=range){
+		if(geolib.getDistance(d1,d2)<=100){
 		  let purchases=val["purchases"];
 		   purchases.forEach((datas1)=>{
 			  let datas=datas1.toObject();
-		      datas["by"]=val["retailername"];
+		      datas["retailer"]=val["retailername"];
+			  datas["retail"]=val["retailname"];
 		      datas["number"]=val["number"];
 		      datas["email"]=val["email"];
+			  datas["latitude"]=val["latitude"];
+			  datas["longitude"]=val["longitude"];
+			  datas["username"]=val["username"];
 		      data.push(datas);
 		   });
 		}
@@ -208,7 +212,7 @@ app.post('/getrelevantpurchases',(req,res)=>{
 
 
 
-app.post('/delivered',(req,res)=>{ //byadmin
+app.post('/delivered',(req,res)=>{ //bydelivery
   user.findByCredentials(req.body.username).then((users)=>{
       users.purchases.forEach((val)=>{
 		if(new Date(val["purchasedDate"]).getMilliseconds()==new Date(req.body.date).getMilliseconds()){
