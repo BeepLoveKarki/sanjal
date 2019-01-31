@@ -1,8 +1,9 @@
-let socket = io();
-getgoods();
-getretails();
-//setInterval(getit,5000);
+$(document).ready(()=>{
+  show(1);
+});
 
+let socket = io();
+let good;
 function getgoods(){
   socket.emit("good","ok");
   socket.on("goods",(data)=>{
@@ -12,11 +13,25 @@ function getgoods(){
 	}else{
 	 data.forEach((val)=>{
 	   val["costs"].forEach((val1,i)=>{
-	       $(".bodyt").append("<tr><td>"+val["name"]+"</td><td>"+val["types"][i]+"</td><td>NRs. "+val1+"</td><td>"+val["units"][i]+"</td><td><i class=\"fa fa-pencil\"></i></td><td><i class=\"fa fa-trash\"></i></td></tr>");
+	       $(".bodyt").append("<tr><td>"+val["name"]+"</td><td>"+val["types"][i]+"</td><td>NRs. "+val1+"</td><td>"+val["units"][i]+"</td><td><i class=\"fa fa-pencil\"></i></td><td><i class=\"fa fa-trash\" onclick=\"deletegoods("+i+")\"></i></td></tr>");
 	   });
 	 });
 	}
   });
+}
+
+
+function getsales(){
+  $.get("/sales").then((data)=>{
+    let d=$.parseJSON(data);
+	let vals={};
+	vals["x"]=d["locs"];
+	vals["y"]=d["datas"];
+	vals["type"]='bar';
+	let graph=new Array();
+	graph.push(vals);
+	Plotly.newPlot('graph', graph);
+   });
 }
 
 function getretails(){
@@ -46,30 +61,65 @@ function getdelivery(){
 	if(data=="no"){
 	   $(".data2").show();
 	}else{
-	
+	   data.forEach((val,index)=>{
+	     $(".bodyt2").append("<tr><td>"+val["name"]+"</td><td>"+val["username"]+"</td><td>"+val["number"].toString()+"</td><td><i class=\"fa fa-pencil\"></i></td><td><i class=\"fa fa-trash\ id=\"deld"+index+"\"></i></td></tr>");
+	   });
 	}
   });
 }
 
 
 function show(a){
+  if(a!=5 && a!=6){
+    $("#"+a.toString()).addClass("active");
+  }
+  for(let i=1;i<4;i++){
+     if(i!=a){
+	   $("#"+i.toString()).removeClass("active");
+	 }
+  }
   switch(a){
     case 1:
+	$("#goods").show();
+	$("#retails").hide();
+	$("#deliveries").hide();
+	$("#sales").hide();
+	getgoods();
+
 	break;
 	
 	case 2:
+	$("#goods").hide();
+	$("#retails").show();
+	$("#deliveries").hide();
+	$("#sales").hide();
+	getretails();
+    setInterval(getretails,5000);
 	break;
 	
 	case 3:
+	$("#goods").hide();
+	$("#retails").hide();
+	$("#deliveries").show();
+	$("#sales").hide();
+	getdelivery();
 	break;
 	
 	case 4:
+	$("#goods").hide();
+	$("#retails").hide();
+	$("#deliveries").hide();
+	$("#sales").show();
+	getsales();
+	setInterval(getsales,5000);
 	break;
 	
 	case 5:
+	$("#up").modal('show');
 	break;
 	
 	case 6:
+	window.location.replace("/logout");
 	break;
   }
 }

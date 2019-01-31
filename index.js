@@ -3,9 +3,10 @@ let cors=require('cors');
 let http=require('http');
 let bodyParser=require('body-parser');
 let bcrypt=require('bcryptjs');
-let fs=require('fs');
 let geolib=require('geolib');
 let fileUpload = require('express-fileupload');
+let session = require('express-session');
+let MongoDBStore = require('connect-mongodb-session')(session);
 let app=express();
 let server=http.createServer(app);
 let io=require('socket.io').listen(server);
@@ -14,12 +15,22 @@ let {user,cart,purchase}=require('./server/models/user.js');
 let category=require('./server/models/category.js');
 let delivery=require('./server/models/delivery.js');
 let admin=require('./server/models/admin.js');
+let store = new MongoDBStore({
+  uri: 'mongodb://localhost:27017/sessions',
+  collection: 'mySessions'
+});
 
 app.use(cors());
 app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.set('viewengine','ejs');
+app.use(require('express-session')({
+ secret: "hey you,yes you!",
+ store: store,
+ resave:true,
+ saveUninitialized:true
+}));
 app.use(express.static(__dirname+'/public'));
 app.use('/static',express.static(__dirname+'/pics'));
 
@@ -37,11 +48,45 @@ io.sockets.on('connection', function (socket) {
 
  
 app.get("/",(req,res)=>{
-   res.render("login.ejs");
+  if(req.session["admin"] && req.session["admin"]=="yes"){
+    res.render("dashboard.ejs");
+  }else{
+    res.render("login.ejs");
+  }
 });
 
-app.get("/dashboard",(req,res)=>{
-   res.render("dashboard.ejs");
+app.post("/adminchange",(req,res)=>{
+  if(req.body["username"].length==0 && req.body["password"].length==0){
+     res.redirect("/");
+  }else if(req.body["username"].length==0 && req.body["password"].length!=0){
+    admin.find({},(err,doc)=>{
+	  let admin1=new admin({username:doc[0]["username"],password:req.body["password"]});
+	  admin.delete({},(err)=>{  
+	    admin1.save().then((doc)=>{
+	      res.redirect("/");
+	    });
+	  });
+	});		
+  }else if(req.body["username"].length!=0 && req.body["password"].length==0){
+    admin.find({},(err,doc)=>{
+	  admin.findOneAndUpdate({username:doc[0]["username"]},{$set:{username:req.body["username"]}},(err,doc)=>{
+	     res.redirect("/");
+	  });
+	});	
+  }else{
+	let admin1=new admin({username:req.body["username"],password:req.body["password"]});
+    admin.delete({},(err)=>{  
+	  admin1.save().then((doc)=>{
+	      res.redirect("/");
+	  });
+	});
+  }
+});
+
+app.get("/logout",(req,res)=>{
+  req.session.destroy(function(err) {
+      res.redirect('/');
+  });
 });
 
 app.get("/retails",(req,res)=>{
@@ -79,6 +124,37 @@ function sendgoods(socket){
  });
 }
 
+
+app.get('/sales',(req,res)=>{
+  let locs=new Array();
+  let datas=new Array();
+  let date=new Date();
+  user.find({},(err,data)=>{
+     if(data.length==0){
+	     res.send(JSON.stringify({status:"no"}));
+	 }else{
+         data.forEach((val)=>{
+		   val["purchases"].forEach((val1)=>{
+		     locs.push(val["address"]);
+			 datas.push(parseFloat(val1["cost"]));
+		   });
+		 });
+		 
+		 for(let i=0;i<locs.length;i++){
+		   
+		   if(locs[i]==locs[i+1]){
+		     datas[i]=datas[i]+datas[i+1];
+			 datas.splice(i+1);
+		   }
+		 
+		 }
+		 
+		 res.send(JSON.stringify({locs,datas}));
+		 
+	 }
+  });
+});
+
 app.post('/login',(req,res)=>{
    user.findByCredentials(req.body.username).then((user)=>{
 	  if(user!=0){
@@ -102,7 +178,7 @@ app.post('/deliverylogin',(req,res)=>{
 app.post('/adminlogin',(req,res)=>{
    admin.findByCredentials(req.body.username).then((user)=>{
 	  if(user!=0){
-	      checkpass(req.body.username,user.password,req.body.password,res,req);
+	      checkpass(req.body.username,user.password,req.body.password,res,req,1);
 	  }else{
 		  res.send(JSON.stringify({status:"no"}));
 	  }
@@ -137,10 +213,10 @@ app.post('/deliverysignup',(req,res)=>{  //by admin
   if(deliverys==0){
     let delivery1=new delivery({username:req.body.username,password:req.body.password,name:req.body.name,number:req.body.number});
 	delivery1.save().then((err,doc)=>{
-	  res.send(JSON.stringify({status:"OK"}));
+	  res.redirect("/");
 	});
   }else{
-    res.send(JSON.stringify({status:"exist"}));	
+    res.redirect("/");	
   }
  });
 });
@@ -178,6 +254,7 @@ app.post('/deliveryloginchange',(req,res)=>{ //by admin
 app.post('/getrelevantpurchases',(req,res)=>{
   let d1={latitude: req.body["lat"], longitude: req.body["long"]};
   //let range=req.body["range"];
+  //console.log(d1);
   let d2={};
   let data=new Array();
   user.find({},(err,users)=>{
@@ -185,7 +262,7 @@ app.post('/getrelevantpurchases',(req,res)=>{
 	  if(val["purchases"].length!=0){
 	    d2["latitude"]=val["latitude"];
 		d2["longitude"]=val["longitude"];
-		if(geolib.getDistance(d1,d2)<=100){
+		if(geolib.getDistance(d1,d2)<=2000){
 		  let purchases=val["purchases"];
 		   purchases.forEach((datas1)=>{
 			  let datas=datas1.toObject();
@@ -259,21 +336,29 @@ app.post('/signup',(req,res)=>{
 });
 
 app.post('/addcategory',(req,res)=>{ //add category
-	category.findByName(req.body.name).then((value)=>{
+	category.findByName(req.body.category).then((value)=>{
 	 if(value==0){
-	   let categories=new category({name:req.body.name,types:[],costs:[],units:[]});
-       req.body.types.forEach((val,index)=>{
-	     categories.types.push(val);
-		 categories.costs.push(req.body.costs[index]);
-		 categories.units.push(req.body.units[index]);
-	   });
+	   let categories=new category({name:req.body.category,types:[],costs:[],units:[]});
+	   categories.types.push(req.body.type);
+	   categories.costs.push(req.body.cost);
+	   categories.units.push(req.body.unit);
 	   categories.save().then((doc)=>{
-	      res.send(JSON.stringify({status:"OK"}));
+	      res.redirect("/");
 	   });
      }else{
-	    res.send(JSON.stringify({status:"exists"}));	
+	    //res.send(JSON.stringify({status:"exists"}));
+        let data=value.toObject();
+        data["types"].push(req.body.type);
+		data["costs"].push(req.body.cost);
+		data["units"].push(req.body.unit);
+		category.deleteOne({name:req.body.category},(err)=>{
+		    let categories=new category({name:req.body.category,types:data["types"],costs:data["costs"],units:data["units"]});
+			categories.save().then((doc)=>{
+	            res.redirect("/");
+	        });
+		});
 	 }
-   });  
+   });   
 });
 
 app.get('/getcategories',(req,res)=>{ //get all categories
@@ -330,9 +415,12 @@ app.post('/getpurchases',(req,res)=>{
    });
 });
 
-function checkpass(username,hash,nohash,res,req){
+function checkpass(username,hash,nohash,res,req,a=0){
   bcrypt.compare(nohash,hash,(err,result)=>{
 		if (result){
+		  if(a!=0){
+		     req.session["admin"]="yes";
+		  }
 	      res.send(JSON.stringify({status:"OK"}));
         }else{
           res.send(JSON.stringify({status:"no"}));

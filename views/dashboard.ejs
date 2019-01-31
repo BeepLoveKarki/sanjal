@@ -15,6 +15,7 @@
 	
 	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	
 	<script src="js/dashboard.js"></script>
@@ -30,39 +31,39 @@
                 <!-- Sidebar -->
                 <ul class="sidebar navbar-nav">
                   
-                  <li class="nav-item active" style="margin-top:20px;">
+                  <li class="nav-item active" style="margin-top:20px;" id="1">
                     <a class="nav-link" onclick="show(1)">
                       <i class="fa fa-fw fa-shopping-cart"></i>
                       <span>Goods</span>
                     </a>
                   </li>
                   
-                  <li class="nav-item">
+                  <li class="nav-item" id="2">
                     <a class="nav-link" onclick="show(2)">
                       <i class="fa fa-fw fa-user"></i>
                       <span>Retailers</span></a>
                   </li>
                   
-                  <li class="nav-item">
+                  <li class="nav-item" id="3">
                     <a class="nav-link" onclick="show(3)">
                       <i class="fa fa-fw fa-shopping-bag"></i>
-                      <span>Delivery Boys</span></a>
+                      <span>Delivery Channels</span></a>
                   </li>
                   
-                  <li class="nav-item">
+                  <li class="nav-item" id="4">
                     <a class="nav-link" onclick="show(4)">
                       <i class="fa fa-fw fa-signal"></i>
                       <span>Sales</span></a>
                   </li>
                   
-                  <li class="nav-item">
+                  <li class="nav-item" id="5">
                     <a class="nav-link" onclick="show(5)">
                       <i class="fa fa-fw fa-gear"></i>
                       <span>Settings</span></a>
                   </li>
                   
                   
-                  <li class="nav-item">
+                  <li class="nav-item" id="6">
                     <a class="nav-link" onclick="show(6)">
                       <i class="fa fa-fw fa-arrow-left"></i>
                       <span>Log Out</span></a>
@@ -70,7 +71,7 @@
                   
                 </ul>
           
-                <div id="content-wrapper">
+                <div id="content-wrapper" style="overflow-x:scroll;">
                   <div class="container-fluid">
                   
                      <section id="goods">
@@ -79,7 +80,7 @@
 						  <h1 id="head">Khudra Goods List</h1>
 						</div>
 						<div class="col-sm-3 col-md-3 cold-xs-3">
-						  <button type="button" class="btn btn-primary text-right" style="margin-top:20px;">Add New Good</button>
+						  <button type="button" class="btn btn-primary text-right" style="margin-top:20px;" data-toggle="modal" data-target="#addgood">Add New Good</button>
 						</div>
 					  </div>
 					   
@@ -157,7 +158,7 @@
 						  <h1 id="head">Khudra Delivery Channels List</h1>
 						</div>
 						<div class="col-sm-3 col-md-3 cold-xs-3">
-						  <button type="button" class="btn btn-primary text-right" style="margin-top:20px;">Add New Delivery Channel</button>
+						  <button type="button" class="btn btn-primary text-right" style="margin-top:20px;" data-toggle="modal" data-target="#adddel">Add New Delivery Channel</button>
 						</div>
 					  </div>
 	
@@ -176,7 +177,7 @@
 							   <tbody class="data2">
 								 <tr>
 								   <td colspan="100%">
-								      <h5 class="text-center">Currently no any delivery boys data found</h5>
+								      <h5 class="text-center">Currently no any delivery channels data found</h5>
 									</td>
 								 </tr>
                                </tbody>
@@ -186,12 +187,113 @@
                                </tbody>
                           </table>
                           </div>
-					 </section>  
+					 </section>
+
+                     <section id="sales">
+					  <div class="row">
+					    <div class="col-sm-9 col-md-9 cold-xs-9">
+						  <h1 id="head">Khudra Sales</h1>
+						</div>
+					  </div>
+					  <div class="row">
+					     <div class="col-sm-12 col-md-12 cold-xs-12">
+						 </div>
+					  </div>
+					  <div class="row">
+					    <div class="col-sm-12 col-md-12 cold-xs-12">
+						  <div id="graph" style="width:600px;height:600px;">
+						  
+						  </div>
+						 </div>
+					  </div>
+                     </section>					  
                   
                   </div>
                 </div>
                 
 			  </div>
+			  
+			  
+			  <div class="modal fade" id="addgood" style="margin-top:80px;">
+                <div class="modal-dialog modal-lg" style="height:450px;" id="f10">
+                    <div class="modal-content" style="width:100%;">
+                        <div class="modal-header"><span style="font-size:18px;" id="headis">Add New Good</span></div>
+                        <div class="modal-body text-center" width="100%;">
+                            
+                            
+                                <form method="POST" action="/addcategory" role="form" id="deform0">
+                                    
+									<input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;" name="category"  class="form-control" placeholder="Enter Good Category" />
+                                     
+                                     <input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="type" placeholder="Enter Good Name" />		
+
+                                      <input type="number" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="cost" placeholder="Enter Good Cost" />		
+                                      
+                                      <input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="unit" placeholder="Enter Good Unit" />											  
+									
+									<!--p id="yahoo" style=" display:none; margin-top:10px; margin-bottom:10px;"></p-->
+									
+									<button type="submit" class="btn btn-outline-primary btn-lg" >Add</button>
+                                </form>
+                            
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+			
+			<div class="modal fade" id="adddel" style="margin-top:80px;">
+                <div class="modal-dialog modal-lg" style="height:450px;" id="f10">
+                    <div class="modal-content" style="width:100%;">
+                        <div class="modal-header"><span style="font-size:18px;" id="headis">Add New Delivery Channel</span></div>
+                        <div class="modal-body text-center" width="100%;">
+                            
+                            
+                                <form method="POST" action="/deliverysignup" role="form" id="deform">
+                                    
+									<input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;" name="name"  class="form-control" placeholder="Enter Delivery Channel Name" required />
+                                     
+									 <input type="number" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="number" placeholder="Enter Delivery Channel Contact No." required />		
+									 
+                                     <input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="username" placeholder="Enter Delivery Channel Username" required />		
+                                      
+                                      <input type="password" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="password" placeholder="Enter Delivery Channel Password" required />											  
+									
+									<!--p id="yahoo" style=" display:none; margin-top:10px; margin-bottom:10px;"></p-->
+									
+									<button type="submit" class="btn btn-outline-primary btn-lg" >Add</button>
+                                </form>
+                            
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+			
+			
+			<div class="modal fade" id="up" style="margin-top:80px;">
+                <div class="modal-dialog modal-lg" style="height:450px;" id="f10">
+                    <div class="modal-content" style="width:100%;">
+                        <div class="modal-header"><span style="font-size:18px;" id="headis">Change Username or Password</span></div>
+                        <div class="modal-body text-center" width="100%;">
+                            
+                            
+                                <form method="POST" action="/adminchange" role="form" id="deform6">
+                                    
+									<input type="text" style="width:95%; margin-left:10px; margin-bottom:10px;" name="username"  class="form-control" placeholder="Enter New Username (Keep empty for no change)" />
+                                      
+                                      <input type="password" style="width:95%; margin-left:10px; margin-bottom:10px;"  class="form-control" name="password" placeholder="Enter New Password (Keep empty for no change)" />											  
+									
+									<!--p id="yahoo" style=" display:none; margin-top:10px; margin-bottom:10px;"></p-->
+									
+									<button type="submit" class="btn btn-outline-primary btn-lg" >Change</button>
+                                </form>
+                            
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
 			  
               
 <footer></footer>
