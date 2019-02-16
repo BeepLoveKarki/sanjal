@@ -80,42 +80,23 @@ function show(a){
   }
   switch(a){
     case 1:
-	$("#goods").show();
-	$("#retails").hide();
-	$("#deliveries").hide();
-	$("#sales").hide();
-	getgoods();
-
+	
 	break;
 	
 	case 2:
-	$("#goods").hide();
-	$("#retails").show();
-	$("#deliveries").hide();
-	$("#sales").hide();
-	getretails();
-    setInterval(getretails,5000);
+	
 	break;
 	
 	case 3:
-	$("#goods").hide();
-	$("#retails").hide();
-	$("#deliveries").show();
-	$("#sales").hide();
-	getdelivery();
+	
 	break;
 	
 	case 4:
-	$("#goods").hide();
-	$("#retails").hide();
-	$("#deliveries").hide();
-	$("#sales").show();
-	getsales();
-	setInterval(getsales,5000);
+	
 	break;
 	
 	case 5:
-	$("#up").modal('show');
+	
 	break;
 	
 	case 6:

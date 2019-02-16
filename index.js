@@ -89,9 +89,6 @@ app.get("/logout",(req,res)=>{
   });
 });
 
-app.get("/retails",(req,res)=>{
-   res.render("retails.ejs");
-});
 
 
 function sendretailers(socket){
@@ -254,7 +251,6 @@ app.post('/deliveryloginchange',(req,res)=>{ //by admin
 app.post('/getrelevantpurchases',(req,res)=>{
   let d1={latitude: req.body["lat"], longitude: req.body["long"]};
   //let range=req.body["range"];
-  //console.log(d1);
   let d2={};
   let data=new Array();
   user.find({},(err,users)=>{
