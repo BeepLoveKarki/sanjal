@@ -15,3 +15,5 @@ function login(){
   });
   }
 }
+
+console.log(document.getElementById("graph"));

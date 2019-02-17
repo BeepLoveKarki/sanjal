@@ -63,6 +63,11 @@ app.get("/robot",(req,res)=>{
    res.render("robot.ejs");
 });
 
+app.get("/try",(req,res)=>{
+   res.render("try.ejs");
+});
+
+
 app.post("/adminchange",(req,res)=>{
   if(req.body["username"].length==0 && req.body["password"].length==0){
      res.redirect("/");

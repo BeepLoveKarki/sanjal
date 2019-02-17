@@ -29,6 +29,9 @@
     "geolib": "^2.0.24",
     "http": "0.0.0",
     "mongoose": "^5.4.6",
-    "socket.io": "^2.2.0"
+    "ngraph.graph": "0.0.15",
+    "ngraph.three": "0.0.16",
+    "socket.io": "^2.2.0",
+    "three": "^0.101.1"
   }
 }
