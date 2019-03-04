@@ -16,14 +16,6 @@ adminSchema.statics.findByCredentials=function(username){
   });
 }
 
-adminSchema.methods.saveRecord=function(){
-return   this.save().then((doc)=>{
-    return doc;
-  },(err)=>{
-    return err;
-  });
-};
-
 adminSchema.pre('save',function(next){  
   if (this.isModified('password')){
     bcrypt.genSalt(10,(err,salt)=>{

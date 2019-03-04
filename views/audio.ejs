@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+   <html>
+    <head>
+        <meta charset="utf-8">
+        <meta content="IE=8" http-equiv="X-UA-Compatible">
+        <title>Social Media Audio Visualizer | Sanjal</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/animate.css">
+        <!--[if lt IE 9]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script src="vendor/jquery-3.2.1.min.js"></script>
+        <script src="js/three.min.js"></script>
+        <script src="js/OBJLoader.js"></script>
+        <script src="js/OrbitControls.js"></script>
+        <script src="js/bufferloader.js"></script>
+        <script src="js/id3-minimized.js"></script>
+        <script src="js/audiovisualisierung.js"></script>
+    </head>
+    <body>
+       	<div id="button_wrapper">
+		    <!--div id="info">Description</div-->
+       		<input type="file" name="file" id="file" class="inputfile" onchange="handleFiles(this.files)"/>
+			<label for="file">Choose file</label>
+      		<div class="button" id="sample" onclick="playSample()">Play sample file</div>
+       	</div>
+       	<div id="loading_screen">
+       		<div id="loading_wrapper">
+				<div class="sk-folding-cube">
+				  <div class="sk-cube1 sk-cube"></div>
+				  <div class="sk-cube2 sk-cube"></div>
+				  <div class="sk-cube4 sk-cube"></div>
+				  <div class="sk-cube3 sk-cube"></div>
+				</div>
+				<div class="label">Loading...</div>
+			</div>
+       	</div>
+       	<div id="viewer_discretion"></div>
+    </body>
+</html>
